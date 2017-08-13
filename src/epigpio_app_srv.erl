@@ -22,15 +22,11 @@
   terminate/2,
   code_change/3]).
 
--define(SERVER, ?MODULE).
-
-%%-record(state, {}).
-
 %%%===================================================================
 %%% API
 %%%===================================================================
 get_epigpio_proc(Client) ->
-  gen_server:call(?SERVER, {get_epigpio_proc, Client}).
+  gen_server:call(?MODULE, {get_epigpio_proc, Client}).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -41,7 +37,7 @@ get_epigpio_proc(Client) ->
 -spec(start_link(pid()) ->
   {ok, Pid :: pid()} | ignore | {error, Reason :: term()}).
 start_link(AppSup) ->
-  gen_server:start_link({local, ?SERVER}, ?MODULE, [AppSup], []).
+  gen_server:start_link({local, ?MODULE}, ?MODULE, [AppSup], []).
 
 %%%===================================================================
 %%% gen_server callbacks
