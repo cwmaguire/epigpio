@@ -23,7 +23,7 @@ start([PIGPIO_IP, PIGPIO_PORT]) ->
   start(normal, []).
 
 start(_StartType, []) ->
-    case epigpio_app_sup:start_link() of
+    case epigpio_sup:start_link() of
         {ok, AppSupPid} ->
             lager:debug("-------> Started epigpio, AppSupPid:  ~p~n",[AppSupPid]),
              application:set_env(epigpio, app_supervisor, AppSupPid),
