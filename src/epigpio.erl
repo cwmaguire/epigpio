@@ -49,7 +49,7 @@
 -type gpio() :: 0..53.
 -type level() :: ?PI_LOW | ?PI_HIGH.
 -type frequency() :: ?PI_HW_PWM_MIN_FREQ..?PI_HW_PWM_MAX_FREQ.
--type mode() :: 0..7.
+-type mode() :: ?PI_INPUT | ?PI_OUTPUT | 2..7.
 -type pud() :: ?PI_PUD_OFF | ?PI_PUD_DOWN | ?PI_PUD_UP.
 -type pulsewidth() :: ?PI_SERVO_OFF | ?PI_MIN_SERVO_PULSEWIDTH..?PI_MAX_SERVO_PULSEWIDTH.
 -type micros() :: non_neg_integer().
@@ -171,9 +171,6 @@ start_link(ClientPid) ->
 %%% gen_server callbacks
 %%%===================================================================
 
--spec(init(Args :: term()) ->
-  {ok, State :: #state{}} | {ok, State :: #state{}, timeout() | hibernate} |
-  {stop, Reason :: term()} | ignore).
 init([ClientPid]) ->
   Port = application:get_env(epigpio, pigpiod_port, 8888),
   Ip = application:get_env(epigpio, pigpiod_ip, "127.0.0.1"),
@@ -182,14 +179,6 @@ init([ClientPid]) ->
   {ok, NotifSocket} = gen_tcp:connect(Ip, Port, [binary, {packet, 0}]),
   {ok, #state{cmd_socket = CmdSocket, notif_socket = NotifSocket, client_pid = ClientPid}}.
 
--spec(handle_call(Request :: term(), From :: {pid(), Tag :: term()},
-    State :: #state{}) ->
-  {reply, Reply :: term(), NewState :: #state{}} |
-  {reply, Reply :: term(), NewState :: #state{}, timeout() | hibernate} |
-  {noreply, NewState :: #state{}} |
-  {noreply, NewState :: #state{}, timeout() | hibernate} |
-  {stop, Reason :: term(), Reply :: term(), NewState :: #state{}} |
-  {stop, Reason :: term(), NewState :: #state{}}).
 handle_call({notification, Cmd}, _From, #state{notif_socket = Socket} = State) ->
   ok = gen_tcp:send(Socket, encode(Cmd, 0, 0, 0)),
   {reply, ok, State};
